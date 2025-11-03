@@ -3,58 +3,102 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Zwiggy — Order Food</title>
+  <title>Zwiggy — Order Food Online</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
 
-  <!-- Tailwind (CDN quick) -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Google Font -->
+  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="{% static 'main/css/style.css' %}">
   <style>
-    body { font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:#fafafa; }
-    .card { border-radius: 14px; box-shadow: 0 8px 24px rgba(16,24,40,0.06); transition: transform .18s ease; }
-    .card:hover { transform: translateY(-6px); }
-    .btn-accent { background: linear-gradient(90deg,#ff7043,#ff5722); color:white; padding:.5rem 1rem; border-radius:.6rem; }
-    .cart-badge { background:#ef4444; color:white; border-radius:999px; padding:.12rem .5rem; font-weight:700; font-size:.85rem; }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #fffaf5;
+    }
+
+    .btn-accent {
+      background: linear-gradient(90deg, #ff914d, #ff5722);
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 0.6rem;
+      transition: 0.3s;
+    }
+
+    .btn-accent:hover {
+      opacity: 0.9;
+    }
+
+    .cart-badge {
+      background: #ef4444;
+      color: #fff;
+      border-radius: 999px;
+      padding: 0.1rem 0.45rem;
+      font-weight: 600;
+      font-size: 0.8rem;
+      position: absolute;
+      top: -6px;
+      right: -10px;
+    }
+
+    .card {
+      border-radius: 14px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+    }
   </style>
 </head>
-<body>
-  <nav class="bg-white shadow-sm">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-      <a href="{% url 'home' %}" class="flex items-center gap-3">
-        <img src="{% static 'main/images/placeholder.png' %}" alt="logo" class="w-10 h-10 rounded-full object-cover">
-        <span class="text-2xl font-bold text-orange-500">Zwiggy</span>
+
+<body class="text-gray-800">
+  <!-- Navbar -->
+  <nav class="bg-white/90 backdrop-blur-sm sticky top-0 z-50 shadow-sm border-b border-orange-100">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <!-- Logo -->
+      <a href="{% url 'home' %}" class="flex items-center space-x-2">
+        <img src="{% static 'main/images/logo2.png' %}" alt="Zwiggy Logo" class="w-24">
       </a>
 
-      <div class="flex items-center gap-6">
-        <a href="{% url 'restaurants' %}" class="text-gray-700 hover:text-orange-500">Restaurants</a>
+      <!-- Nav Links -->
+      <div class="hidden md:flex items-center gap-8">
+        <a href="{% url 'restaurants' %}" class="text-gray-700 hover:text-orange-600 font-medium">Restaurants</a>
         {% if user.is_authenticated %}
-          <span class="text-gray-600">Hi, {{ user.username }}</span>
-          <a href="{% url 'logout' %}" class="text-gray-700 hover:text-orange-500">Logout</a>
+          <span class="text-gray-700">👋 Hi, <span class="font-semibold">{{ user.username }}</span></span>
+          <a href="{% url 'logout' %}" class="hover:text-orange-600 font-medium">Logout</a>
         {% else %}
-          <a href="{% url 'login' %}" class="text-gray-700 hover:text-orange-500">Login</a>
-          <a href="{% url 'signup' %}" class="text-gray-700 hover:text-orange-500">Signup</a>
+          <a href="{% url 'login' %}" class="hover:text-orange-600 font-medium">Login</a>
+          <a href="{% url 'signup' %}" class="btn-accent text-sm font-medium">Signup</a>
         {% endif %}
-
+        
+        <!-- Cart -->
         <a href="{% url 'view_cart' %}" class="relative inline-flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m12-9l2 9M9 21h6" />
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-gray-700 hover:text-orange-600 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m12-9l2 9M9 21h6" />
           </svg>
-          <span class="cart-badge ml-2">{{ cart_count|default:0 }}</span>
+          <span class="cart-badge">{{ cart_count|default:0 }}</span>
         </a>
       </div>
     </div>
   </nav>
 
-  <main class="max-w-6xl mx-auto px-4 py-8">
-    {% block content %}{% endblock %}
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-6 py-10">
+    {% block content %}
+    {% endblock %}
   </main>
 
-  <footer class="text-center py-6 text-sm text-gray-500">
-    © {{ now.year }} Zwiggy — Built with ❤️
-  </footer>
-</body>
-</html>
+  <!-- Footer -->
+  <footer class="bg-gradient-to-r from-orange-500 to-orange-600 text-white py-8 mt-12">
+    <div class="max-w-7xl mx-auto text-center space-y-2">
+      <h3 class="text-lg font-semibold tracking-wide">Zwiggy — Delivering Happiness 🍔</h3>
+      <p class="text-sm opacity-90">© {{ now.year }} Zwiggy. Built with ❤️ by Food Lovers.</p>
+      <div class="flex justify-center space-x-4 pt-2">
+        <a href="#" class="hover:opacity-80 transition"><img src="{% static 'main/images/facebook.svg' %}" class="w-5"></a>
+        <a href="#" class="hover:opacity-80 transition"><img src="{% static 'main/images/instagram.svg' %}" class="w-5"></a>
+        <a href="#" class="hover:opacity-80 tran
