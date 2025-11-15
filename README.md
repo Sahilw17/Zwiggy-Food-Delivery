@@ -5,8 +5,9 @@ Users can browse restaurants, explore menus, add food items to the cart, and pla
 
 Key features include:
 🔹 User Authentication (Login/Signup)
-🔹 Browse Restaurants & Menus
+🔹 Browse Restaurants & Menus 
 🔹 Add to Cart & Place Orders
 🔹 Restaurant Dashboard for Management
 🔹 Admin Panel for Platform Control
+
 
