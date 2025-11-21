@@ -13,6 +13,7 @@
       </tr>
     </thead>
     <tbody>
+
       {% for it in cart_items %}
       <tr class="border-b">
         <td class="py-3">
@@ -22,27 +23,38 @@
             {% else %}
             <img src="{% static 'main/images/placeholder.png' %}" class="w-12 h-12 object-cover rounded">
             {% endif %}
-            <div>
-              <div class="font-medium">{{ it.name }}</div>
-            </div>
+
+            <div class="font-medium">{{ it.name }}</div>
           </div>
         </td>
+
         <td>{{ it.qty }}</td>
+
         <td>₹{{ it.price }}</td>
+
         <td>₹{{ it.total }}</td>
+
         <td>
           <a href="{% url 'remove_from_cart' it.id %}" class="text-red-500 hover:underline">Remove</a>
         </td>
       </tr>
       {% endfor %}
+
     </tbody>
   </table>
 
+  <!-- Total + Checkout -->
   <div class="mt-6 text-right">
     <div class="text-xl font-semibold">Total: ₹{{ total }}</div>
-    <button class="mt-3 btn-accent">Proceed to Checkout</button>
+
+    <a href="{% url 'checkout' %}"
+       class="btn-accent inline-block mt-3 text-lg font-semibold px-6 py-2">
+      Proceed to Checkout
+    </a>
   </div>
+
 </div>
+
 {% else %}
 <p class="text-gray-600">Your cart is empty. Add some tasty items 🙂</p>
 {% endif %}

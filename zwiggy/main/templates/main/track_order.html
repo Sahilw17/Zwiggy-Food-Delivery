@@ -1,0 +1,158 @@
+{% extends "main/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="max-w-2xl mx-auto mt-12 p-8 bg-white rounded-3xl shadow-xl text-center">
+
+    <h1 class="text-3xl font-extrabold text-orange-500 mb-3">
+        🚚 Track Your Order
+    </h1>
+
+    <p class="text-gray-600 mb-8">
+        Order <b>#{{ order.id }}</b> • {{ order.created_at|date:"M d, Y h:i A" }}
+    </p>
+
+    <!-- PROGRESS TRACK -->
+    <div class="relative w-full mb-12">
+
+        <!-- Background line -->
+        <div class="absolute top-1/2 left-0 w-full h-1 bg-gray-200 rounded-full"></div>
+
+        <!-- Animated progress line -->
+        <div id="progress-line"
+             class="absolute top-1/2 left-0 h-1 bg-gradient-to-r from-orange-400 to-orange-600 rounded-full shadow-md"
+             style="width:0%; transition:width 1s ease;">
+        </div>
+
+        <!-- Steps -->
+        <div class="flex justify-between items-center relative z-10 px-2">
+
+            <!-- 1 -->
+            <div class="step-block flex flex-col items-center">
+                <div id="step1" class="circle">
+                    <img src="{% static 'main/images/check.svg' %}" class="w-7">
+                </div>
+                <p class="step-text mt-2">Placed</p>
+            </div>
+
+            <!-- 2 -->
+            <div class="step-block flex flex-col items-center">
+                <div id="step2" class="circle">
+                    <img src="{% static 'main/images/cook.svg' %}" class="w-7">
+                </div>
+                <p class="step-text mt-2">Preparing</p>
+            </div>
+
+            <!-- 3 -->
+            <div class="step-block flex flex-col items-center">
+                <div id="step3" class="circle">
+                    <img src="{% static 'main/images/bike.svg' %}" class="w-7">
+                </div>
+                <p class="step-text mt-2">On the Way</p>
+            </div>
+
+            <!-- 4 -->
+            <div class="step-block flex flex-col items-center">
+                <div id="step4" class="circle">
+                    <img src="{% static 'main/images/done.svg' %}" class="w-7">
+                </div>
+                <p class="step-text mt-2">Delivered</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Status text -->
+    <p id="status-text" class="text-lg font-semibold text-gray-800">
+        🧾 Order Placed
+    </p>
+
+</div>
+
+<!-- STYLES -->
+<style>
+    .circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: #f3f3f3;
+        border: 3px solid #d0d0d0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: 0.5s ease;
+    }
+
+    .circle.active {
+        background: linear-gradient(135deg, #ff8a3d, #ff6a00);
+        border-color: #ff6a00;
+        box-shadow: 0 0 18px rgba(255, 124, 40, 0.6);
+        transform: scale(1.15);
+    }
+
+    .step-text {
+        font-size: 0.85rem;
+        color: #666;
+        transition: 0.3s;
+    }
+
+    .step-text.active {
+        color: #ff6a00;
+        font-weight: 600;
+    }
+</style>
+
+<!-- SCRIPT -->
+<script>
+    // Total animation time (smooth, fast)
+    const DURATION = 4500; // 4.5 seconds total
+    const start = performance.now();
+
+    const steps = [
+        "🧾 Order Placed",
+        "👨‍🍳 Restaurant is Preparing",
+        "🏍️ On the Way",
+        "🎉 Delivered"
+    ];
+
+    const stepIds = ["step1", "step2", "step3", "step4"];
+    const stepTexts = document.getElementsByClassName("step-text");
+
+    // Stage activation at clean checkpoints
+    const checkpoints = [0, 0.33, 0.66, 1.0];
+
+    let activated = [false, false, false, false];
+
+    function update() {
+        const now = performance.now();
+        let progress = Math.min((now - start) / DURATION, 1);  // 0 → 1
+
+        // Smooth bar movement
+        document.getElementById("progress-line").style.width = (progress * 100) + "%";
+
+        // Trigger each stage ONCE when passing checkpoints
+        checkpoints.forEach((cp, i) => {
+            if (!activated[i] && progress >= cp) {
+                activated[i] = true;
+
+                // Activate circle
+                document.getElementById(stepIds[i]).classList.add("active");
+                stepTexts[i].classList.add("active");
+
+                // Update main status text
+                document.getElementById("status-text").innerHTML = steps[i];
+            }
+        });
+
+        // Continue animation
+        if (progress < 1) {
+            requestAnimationFrame(update);
+        }
+    }
+
+    requestAnimationFrame(update);
+</script>
+
+
+{% endblock %}

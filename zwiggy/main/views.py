@@ -7,6 +7,12 @@ from .models import Restaurant, MenuItem, CartItem
 from django.contrib.auth.decorators import login_required
 from decimal import Decimal
 from django.db import models
+from django.contrib.auth.decorators import login_required
+from .models import Restaurant, MenuItem, CartItem, Order, OrderItem
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from decimal import Decimal
 
 
 
@@ -45,18 +51,31 @@ def signup_view(request):
     return render(request, 'main/signup.html')
 
 def login_view(request):
+    next_url = request.GET.get('next')  # if coming from /cart/
+    
     if request.method == 'POST':
         username = request.POST.get('username', '').strip()
         password = request.POST.get('password', '')
+        
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            # If there was a session-cart, merge it into DB cart
+
+            # Merge guest cart if exists
             _merge_session_cart_to_db(request, user)
+
+            # Redirect user to the original page they came from
+            if next_url:
+                return redirect(next_url)
             return redirect('home')
+
         else:
-            return render(request, 'main/login.html', {'error': 'Invalid credentials.'})
-    return render(request, 'main/login.html')
+            return render(request, 'main/login.html', {
+                'error': 'Invalid credentials.',
+                'next': next_url
+            })
+    
+    return render(request, 'main/login.html', {'next': next_url})
 
 def logout_view(request):
     logout(request)
@@ -133,7 +152,9 @@ def remove_from_cart(request, item_id):
             request.session['cart'] = session_cart
     return redirect('view_cart')
 
+@login_required(login_url='login')
 def view_cart(request):
+
     if request.user.is_authenticated:
         items = CartItem.objects.filter(user=request.user).select_related('item')
         cart_items = [{
@@ -169,3 +190,58 @@ def view_cart(request):
         'total': total,
         'cart_count': _get_cart_count(request),
     })
+@login_required
+def checkout(request):
+    cart_items = CartItem.objects.filter(user=request.user)
+
+    if not cart_items.exists():
+        messages.error(request, "Your cart is empty.")
+        return redirect('view_cart')
+
+    # Total
+    total_amount = sum(ci.item.price * ci.quantity for ci in cart_items)
+
+    # Get restaurant delivery time from first item
+    restaurant = cart_items.first().item.restaurant
+    delivery_time_text = restaurant.delivery_time  # "30-40 mins"
+
+    # extract integer avg minutes
+    try:
+        mins = delivery_time_text.replace("mins", "").strip()
+        if "-" in mins:
+            a, b = mins.split("-")
+            delivery_minutes = (int(a) + int(b)) // 2
+        else:
+            delivery_minutes = int(mins)
+    except:
+        delivery_minutes = 30  # fallback
+
+    # Create order
+    order = Order.objects.create(
+        user=request.user,
+        total=total_amount,
+        delivery_minutes=delivery_minutes
+    )
+
+    # Order items
+    for ci in cart_items:
+        OrderItem.objects.create(
+            order=order,
+            menu_item=ci.item,
+            quantity=ci.quantity,
+            price=ci.item.price
+        )
+
+    cart_items.delete()
+
+    return redirect('order_success', order_id=order.id)
+
+@login_required
+def order_success(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    return render(request, "main/order_success.html", {"order": order})
+
+@login_required
+def track_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id, user=request.user)
+    return render(request, "main/track_order.html", {"order": order})

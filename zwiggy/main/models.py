@@ -34,3 +34,22 @@ class CartItem(models.Model):
 
     def total_price(self):
         return self.item.price * self.quantity
+    
+class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+    delivery_minutes = models.PositiveIntegerField(default=30)  # NEW FIELD
+
+    def __str__(self):
+        return f"Order #{self.id} by {self.user.username}"
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    menu_item = models.ForeignKey(MenuItem, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    price = models.DecimalField(max_digits=8, decimal_places=2)  # per-item price
+
+    def __str__(self):
+        return f"{self.menu_item.name} x {self.quantity}"

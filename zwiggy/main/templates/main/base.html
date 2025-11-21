@@ -75,7 +75,7 @@
         {% endif %}
 
         <!-- Cart -->
-        <a href="{% url 'view_cart' %}" class="relative inline-flex items-center">
+        <a href="{% url 'view_cart' %}?next={% url 'view_cart' %}" class="relative inline-flex items-center">
           <svg xmlns="http://www.w3.org/2000/svg"
                class="h-7 w-7 text-gray-700 hover:text-orange-600 transition"
                fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -97,5 +97,25 @@
   </main>
 
   <!-- Footer -->
-  <footer class="bg-gradient-to-r from-orange-500 to-orange-600 text-white py-8 mt-16">
-    <div class="max-w-7xl mx
+<!-- Footer -->
+<footer class="bg-gradient-to-r from-orange-500 to-orange-600 text-white py-8 mt-12">
+  <div class="max-w-7xl mx-auto text-center space-y-2">
+
+    <h3 class="text-lg font-semibold tracking-wide">
+      Zwiggy — Delivering Happiness 🍔
+    </h3>
+
+    <p class="text-sm opacity-90">
+      © {{ now.year }} Zwiggy. Built with ❤️ by 
+      <span class="font-semibold">Sahil</span>, 
+      <span class="font-semibold">Gaurav</span>, 
+      <span class="font-semibold">Ritesh</span>
+    </p>
+
+    <p class="text-xs opacity-80 italic">
+      “Good food is not just a meal, it’s a feeling — and we deliver that feeling fast.”  
+    </p>
+
+
+  </div>
+</footer>
